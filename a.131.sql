@@ -1,4 +1,4 @@
-use [sql-ex];
+﻿use [sql-ex];
 
 ---
 with symsa as (
