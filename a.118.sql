@@ -1,3 +1,10 @@
+
+-- Выборы Директора музея ПФАН проводятся только в високосный год, в первый вторник апреля после первого понедельника апреля.
+-- Для каждой даты из таблицы Battles определить дату ближайших (после этой даты) выборов Директора музея ПФАН.
+-- Вывод: сражение, дата сражения, дата выборов. Даты выводить в формате "yyyy-mm-dd".
+
+-- cost 0.059129204601049 operations 15 
+
 with Pos(P) as(
  select P FROM
  (
@@ -20,18 +27,18 @@ with Pos(P) as(
  end
  as battle_dt,
 
-datename(year,election_dt)+'-'+
+datename(year,election_date)+'-'+
  case
- when Month(election_dt)>=10
- then cast(Month(election_dt) as char(2))
- else '0'+cast(Month(election_dt) as char(1))
+ when Month(election_date)>=10
+ then cast(Month(election_date) as char(2))
+ else '0'+cast(Month(election_date) as char(1))
  end+
  case
- when day(election_dt)>=10
- then '-'+cast(day(election_dt) as char(2))
- else '-0'+cast(day(election_dt) as char(1))
+ when day(election_date)>=10
+ then '-'+cast(day(election_date) as char(2))
+ else '-0'+cast(day(election_date) as char(1))
  end
- as election_dt
+ as election_date
 
 from
 (select name,date as battle_dt,
@@ -56,7 +63,7 @@ from
 	(DATEPART(year,DATEADD(dd,P,nY_date))%100=0 and DATEPART(year,DATEADD(dd,P,nY_date))%400=0 ))
 	and MONTH (DATEADD(dd,P,nY_date))=4 and DATEPART(dw,DATEADD(dd,P,nY_date)) =2+(8-@@DATEFIRST) % 7
 	and MONTH (DATEADD(dd,P-1,nY_date))=4 and DAY(DATEADD(dd,P-1,nY_date))<=8
-	) election_dt
+	) election_date
 	from Battles B
 	)z
 
