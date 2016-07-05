@@ -7,3 +7,5 @@ from product left join PC on product.model = pc.model
 where [type] = 'PC'
 group by maker
 having sum(iif(pc.model is null, 1, 0)) = 0
+
+-- 
