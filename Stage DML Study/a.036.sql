@@ -1,6 +1,6 @@
+п»ї
 
-
--- Перечислите названия головных кораблей, имеющихся в базе данных (учесть корабли в Outcomes). 
+-- С•РµСЂРµС‡РёСЃР»РёС‚Рµ РЅР°Р·РІР°РЅРёВ¤ РіРѕР»РѕРІРЅС‹С… РєРѕСЂР°Р±Р»РµР№, РёРјРµСЋС‰РёС…СЃВ¤ РІ Р±Р°Р·Рµ РґР°РЅРЅС‹С… (СѓС‡РµСЃС‚СЊ РєРѕСЂР°Р±Р»Рё РІ Outcomes). 
 
 select distinct dbo.Classes.class
 from dbo.Classes left join dbo.Ships on Ships.class = Classes.class left join dbo.Outcomes on dbo.Classes.class = dbo.Outcomes.ship
