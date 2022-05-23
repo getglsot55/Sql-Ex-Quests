@@ -22,3 +22,33 @@ select ctf.[name] as [psg],
 		else (select name from ctg ga where ga.[rn] = ctg.[rn] + 1)
 	end as [next]
 from ctf join ctg on [ctg].[ID_psg] = [ctf].[ID_psg];
+
+
+Вот более интуитивно понятное:
+
+with A as (
+select ID_psg
+,case when lag(ID_psg) over(order by ID_psg) is null then max(ID_psg) over()
+else lag(ID_psg) over(order by ID_psg) end AS lag
+,case when lead(ID_psg) over(order by ID_psg) is null then min(ID_psg) over()
+else lead(ID_psg) over(order by ID_psg) end AS lead
+,sum(cnt) as f1
+,max(sum(cnt)) over() as f2 
+	from 
+ 	(
+select ID_psg, count(trip_no) as cnt from Pass_in_trip
+group by ID_psg
+union all
+select ID_psg, 0 from Passenger
+ 	) as A
+	group by ID_psg
+)
+
+select Passenger.name, P1.name, P2.name from A 
+join Passenger
+on A.ID_psg = Passenger.ID_psg
+join Passenger as P1
+on A.lag = P1.ID_psg
+join Passenger as P2
+on A.lead = P2.ID_psg
+where A.f1 = A.f2
