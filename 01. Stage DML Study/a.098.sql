@@ -18,3 +18,23 @@ with ctebins as
  select distinct code, speed, ram
  from ctebins 
  where working_level = 0 and charindex('1111', ctebins.binval, 0) <> 0 ; 
+
+---
+
+Чуть проще и чуть нагляднее:
+
+with A as (
+select code, speed, ram 
+, cast((speed | ram) as int) as num
+, cast((speed | ram) as int) as bin_level
+, cast('' as varchar(max)) as bin from PC
+union all
+select code, speed, ram
+, num / 2
+, num % 2
+, cast(num % 2 as varchar(max)) + bin from A
+where num > 0
+)
+
+select distinct code, speed, ram from A 
+where patindex('%1111%', bin) > 0
