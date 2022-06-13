@@ -22,6 +22,20 @@ from d1
 group by d1.point, d1.[date]
 order by d1.point, DP;
 
+---
+
+C datepart, конечно, поизящнее выглядит:
+
+with A as (
+select point, date as DP, date as DI from Income_o 
+   union all
+select point, DP, dateadd(day, 1, DI) from A as A1
+ where DI in (select date from Outcome_o where A1.point = Outcome_o.point) 
+ or datepart(weekday, DI) = 1
+)
+
+select point, DP, max(DI) from A group by point, DP
+
 -- cost 0.02682138979435 operations 19 
 with d1 as (
 select inco.point, inco.[date], 
