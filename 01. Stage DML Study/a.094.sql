@@ -40,3 +40,29 @@
 		SELECT 6) t, (Select top 1 date From pt Where count = max) p)
 Select date,ISNULL((Select count From pt Where date = da.date),0)
 From da
+
+---
+
+Вот более интуитивно понятный вариант с рекурсивной CTE:
+
+with A as ( select date
+, count(distinct Trip.trip_no) cnt1
+, max(count(distinct Trip.trip_no)) over() cnt2 
+  from Pass_in_trip join Trip on Pass_in_trip.trip_no = Trip.trip_no
+  where town_from = 'Rostov'
+  group by date
+          ),
+
+B as (
+select min(date) as d1, 0 as ff, 0 as flag from A where cnt1 = cnt2
+  union all
+select dateadd(day, 1, d1 ), 0, flag+1 from B where flag<6
+      ),
+
+C as (
+select d1, cnt1 from B join A on B.d1 = A.date
+  union 
+select d1, ff from B
+      )
+
+select d1, sum(cnt1) from C group by d1
