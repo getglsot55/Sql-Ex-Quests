@@ -72,3 +72,42 @@ with  [Pos]([P])
                                                               [Pos].[P] - 1, [z2].[nY_date])) <= 8) [election_date]
            from   [dbo].[Battles] [B]) [z];
 
+---
+
+Тоже громоздкий, но более понятный способ:
+
+with A as (select min(year(coalesce(date, '2000-01-01'))) as mi from Battles),
+
+B as (select max(year(coalesce(date, '2000-01-01'))) as ma from Battles),
+
+C as (
+select (select * from A) as year 
+union all
+select year+1 from C where year < (select * from B) + 4
+),
+
+D as (
+select 1 as day
+union all
+select day+1 from D where day<30
+),
+
+F as (
+select cast(trim(str(year)) + '-04-' + IIF(len(D.day) = 1, '0' + trim(str(D.day)), trim(str(D.day))) as date) as dat from C, D
+),
+
+E as (
+select dat from F where datepart(weekday, dat) = 3
+and YEAR(dat) & 3 = 0 AND (YEAR(dat) % 25 <> 0 OR YEAR(dat) & 15 = 0)
+),
+
+J as (
+select *, row_number() over(partition by name order by date) as flag from Battles left join E on Battles.date < E.dat
+)
+
+select name, 
+trim(str(year(date))) + '-' + 
+IIF(len(month(date)) = 1, '0' + trim(str(month(date))), trim(str(month(date)))) + '-' + 
+IIF(len(day(date)) = 1, '0' + trim(str(day(date))), trim(str(day(date)))) 
+as dd, dat from J where flag = 1
+OPTION (MAXRECURSION 1000)
