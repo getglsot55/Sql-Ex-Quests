@@ -76,9 +76,9 @@ with  [Pos]([P])
 
 Тоже громоздкий, но более понятный способ:
 
-with A as (select min(year(coalesce(date, '2000-01-01'))) as mi from Battles),
+with A as (select min(year(date)) as mi from Battles),
 
-B as (select max(year(coalesce(date, '2000-01-01'))) as ma from Battles),
+B as (select max(year(date)) as ma from Battles),
 
 C as (
 select (select * from A) as year 
