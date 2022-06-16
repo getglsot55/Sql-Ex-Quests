@@ -59,3 +59,21 @@ from (
 	group by ID_comp with cube
 ) as a
 left join Company c on a.ID_comp = c.ID_comp
+
+---
+
+with A as (
+select distinct ID_comp, date, Pass_in_trip.trip_no, time_out, time_in
+, convert(
+   numeric(18,2), datediff(mi, time_out, IIF(time_in <= time_out, dateadd(day, 1, time_in), time_in))
+          ) as dd
+from Pass_in_trip join Trip on Pass_in_trip.trip_no = Trip.trip_no
+)
+
+select coalesce(Company.name, 'TOTAL') as Company
+, convert(numeric(18,2), avg(dd))
+, convert(numeric(18,2), Exp(avg(Log(dd))))
+, convert(numeric(18,2), sqrt(avg(dd*dd)))
+, convert(numeric(18,2), count(*)/sum(1/dd))
+from A left join Company on A.ID_comp = Company.ID_comp
+group by Company.name WITH ROLLUP
